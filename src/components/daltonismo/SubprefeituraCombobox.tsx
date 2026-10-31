@@ -81,6 +81,7 @@ export function SubprefeituraCombobox({
                   <CommandItem
                     key={opcao.id}
                     value={opcao.nome}
+                    className="cursor-pointer"
                     data-checked={value === opcao.id}
                     onSelect={() => {
                       onChange(opcao.id);

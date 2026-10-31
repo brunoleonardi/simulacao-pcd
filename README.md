@@ -1,37 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Além das Barreiras
 
-## Getting Started
+**Capacitismo no ambiente de trabalho** — simulações interativas que colocam você em tarefas reais de rotina profissional, com barreiras sensoriais e motoras, para refletir sobre acessibilidade no dia a dia do trabalho.
 
-First, run the development server:
+> Personagens, empresas e indicadores dos mapas são fictícios. Os cenários servem como exercício interno de conscientização, não como avaliação de desempenho.
+
+---
+
+## Intuito do projeto
+
+Muitas barreiras no trabalho não aparecem em políticas formais: aparecem em **e-mails com prazo**, **mapas coloridos**, **formulários apertados** e **interfaces que assumem visão e controle motor “padrão”**.
+
+Este repositório reúne **duas experiências** em formato web (Next.js), cada uma com fluxo **Preparação → Atividade → Conclusão**:
+
+| Módulo | Cenário | O que você faz |
+|--------|---------|----------------|
+| **Daltonismo** | Operações · e-mail + mapa de São Paulo | Escolhe um perfil de visão de cores, lê a demanda como no correio, interpreta o mapa das subprefeituras pela legenda e responde três perguntas de prioridade. |
+| **Tremor motor** | RH · ficha de cadastro | Preenche campos com simulação de tremor no cursor e teclado virtual, como quem tem dificuldade de apontar e clicar com precisão. |
+
+O objetivo não é “acertar por acertar”, e sim **sentir o atrito** de tarefas comuns quando a interface ou a informação não foi pensada para todo mundo — e, na conclusão, **comparar** o que você viu com uma referência mais acessível (por exemplo, mapa com cores de referência ou formulário sem tremor).
+
+---
+
+## Daltonismo · detalhes técnicos (resumo)
+
+- Mapa operacional de **subprefeituras de São Paulo** (GeoJSON derivado de dados abertos; script `npm run build:mapa-sp`).
+- **Mesma paleta de prioridade** na atividade e na conclusão: na tarefa as cores passam por **simulação**; no fechamento você vê a **referência** sem simulação.
+- Simulação: **Machado et al. (2009)** para protanopia/deuteranopia; **Brettel et al. (1997)** para tritanopia (via pipeline alinhado ao [DaltonLens](https://daltonlens.org/)).
+- Nenhum simulador reproduz com **100% de fidelidade** a visão de uma pessoa real (variação individual, monitor, luz). A conclusão inclui uma nota curta sobre esse limite.
+
+---
+
+## Tremor motor · detalhes técnicos (resumo)
+
+- Offset aleatório no cursor durante a simulação, com clique sintético nos alvos sob o ponteiro “tremido”.
+- Teclado virtual para reduzir dependência de digitação precisa no teclado físico.
+
+---
+
+## Como rodar
+
+Requisitos: **Node.js 20+**, npm.
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Outros comandos:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build    # build de produção
+npm run start    # servir build
+npm run lint     # ESLint
+```
 
-## Learn More
+Regenerar GeoJSON do mapa (opcional):
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build:mapa-sp
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Stack principal
 
-## Deploy on Vercel
+- [Next.js](https://nextjs.org) (App Router) · React 19 · TypeScript  
+- [Tailwind CSS](https://tailwindcss.com) v4  
+- [MapLibre GL](https://maplibre.org/) + OpenStreetMap  
+- [shadcn/ui](https://ui.shadcn.com) (combobox de respostas, etc.)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# simulacao-pcd
+## Estrutura (visão geral)
+
+```
+src/
+├── app/                    # rotas (/, experiencias/daltonismo, experiencias/tremor, reflexão)
+├── components/
+│   ├── daltonismo/         # e-mail, mapa, legenda, combobox
+│   ├── tremor/             # formulário RH, teclado virtual
+│   └── layout/             # shell, header, reiniciar experiência
+└── lib/                    # cores/simulação CVD, mapa SP, tremor
+public/data/                # GeoJSON subprefeituras (após build:mapa-sp)
+```
+
+---
+
+## Licença e uso
+
+Projeto privado (`"private": true` no `package.json`). Adapte créditos e avisos institucionais conforme o contexto em que for utilizado (treinamento, faculdade, RH, etc.).
+
+---
+
+**Além das Barreiras** — porque acessibilidade também se pratica no e-mail que você manda, no mapa que você publica e no formulário que você exige que todos preencham.

@@ -27,6 +27,8 @@ import {
   type ResultadoPerguntaAtividade,
   type SubprefeituraId,
 } from "@/lib/mapa-sp-subprefeituras";
+import { setExperienceInProgress } from "@/lib/experience-progress";
+import { loadSpSubprefeiturasGeoJson } from "@/lib/sp-subprefeituras-geojson";
 
 type Etapa = "escolha" | "atividade" | "conclusao";
 
@@ -54,8 +56,12 @@ export function DaltonismoExperience() {
   );
   const conclusaoInicioRef = useRef<HTMLDivElement>(null);
 
-  const subprefsOrdenadas = [...SUBPREFEITURAS].sort((a, b) =>
-    a.nome.localeCompare(b.nome, "pt-BR"),
+  const subprefsOrdenadas = useMemo(
+    () =>
+      [...SUBPREFEITURAS].sort((a, b) =>
+        a.nome.localeCompare(b.nome, "pt-BR"),
+      ),
+    [],
   );
 
   const filtroAtivo = etapa === "atividade" && daltonismo !== null;
@@ -77,6 +83,16 @@ export function DaltonismoExperience() {
     if (etapa !== "conclusao" || !resultados) return;
     conclusaoInicioRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [etapa, resultados]);
+
+  useEffect(() => {
+    setExperienceInProgress("daltonismo", etapa !== "escolha");
+  }, [etapa]);
+
+  useEffect(() => {
+    if (etapa === "escolha") {
+      void loadSpSubprefeiturasGeoJson();
+    }
+  }, [etapa]);
 
   if (etapa === "escolha") {
     return (

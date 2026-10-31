@@ -1,11 +1,12 @@
 import type { PerfilDaltonismo, PerfilVisualMapa } from "@/lib/colorBlind";
+import { memo } from "react";
 import {
   corPrioridadeExibicao,
   FAIXA_MAPA_ROTULO,
   FAIXAS_PRIORIDADE_MAPA,
 } from "@/lib/mapa-sp-subprefeituras";
 
-export function MapaLegendaIndicadores({
+export const MapaLegendaIndicadores = memo(function MapaLegendaIndicadores({
   perfilVisual = "oficial",
   perfilExperiencia,
 }: {
@@ -67,4 +68,4 @@ export function MapaLegendaIndicadores({
       </div>
     </aside>
   );
-}
+});

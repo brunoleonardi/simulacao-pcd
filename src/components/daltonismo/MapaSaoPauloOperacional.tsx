@@ -2,8 +2,7 @@
 
 import "./maplibre-worker";
 import { useEffect, useRef } from "react";
-import { Map } from "maplibre-gl";
-import type { Map as MapLibreMap, MapMouseEvent, GeoJSONSource } from "maplibre-gl";
+import { Map as MapLibreMap, type MapMouseEvent, GeoJSONSource } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import bbox from "@turf/bbox";
 import type { PerfilDaltonismo, PerfilVisualMapa } from "@/lib/colorBlind";
@@ -12,6 +11,7 @@ import {
   FONTE_MAPA,
   type FaixaPrioridadeMapa,
 } from "@/lib/mapa-sp-subprefeituras";
+import { loadSpSubprefeiturasGeoJson } from "@/lib/sp-subprefeituras-geojson";
 import { MapaLegendaIndicadores } from "@/components/daltonismo/MapaLegendaIndicadores";
 import type { FeatureCollection, MultiPolygon, Polygon } from "geojson";
 
@@ -26,12 +26,25 @@ type Props = {
 const LAYER_FILL = "sp-fill-prioridade";
 const SOURCE_ID = "sp-subprefs";
 
+const coloredGeoJsonCache = new Map<
+  string,
+  FeatureCollection<Polygon | MultiPolygon>
+>();
+
+function cacheKey(perfil: PerfilVisualMapa, perfilExperiencia?: PerfilDaltonismo) {
+  return `${perfil}:${perfilExperiencia ?? "-"}`;
+}
+
 function comCoresExibicao(
   subprefs: FeatureCollection<Polygon | MultiPolygon>,
   perfil: PerfilVisualMapa,
   perfilExperiencia?: PerfilDaltonismo,
 ): FeatureCollection<Polygon | MultiPolygon> {
-  return {
+  const key = cacheKey(perfil, perfilExperiencia);
+  const cached = coloredGeoJsonCache.get(key);
+  if (cached) return cached;
+
+  const painted: FeatureCollection<Polygon | MultiPolygon> = {
     ...subprefs,
     features: subprefs.features.map((feature) => {
       const faixa = feature.properties?.faixa_mapa as
@@ -49,6 +62,8 @@ function comCoresExibicao(
       };
     }),
   };
+  coloredGeoJsonCache.set(key, painted);
+  return painted;
 }
 
 export function MapaSaoPauloOperacional({
@@ -68,7 +83,7 @@ export function MapaSaoPauloOperacional({
 
     let ativo = true;
 
-    const map = new Map({
+    const map = new MapLibreMap({
       container: containerRef.current,
       style: {
         version: 8,
@@ -115,15 +130,14 @@ export function MapaSaoPauloOperacional({
     };
 
     let onMouseMove: ((e: MapMouseEvent) => void) | null = null;
+    let moveRaf = 0;
+    let ultimoEvento: MapMouseEvent | null = null;
 
     const onContainerLeave = () => esconderTooltip();
 
     map.on("load", async () => {
       if (!ativo) return;
-      const res = await fetch("/data/sp-subprefeituras.geojson");
-      const subprefs = (await res.json()) as FeatureCollection<
-        Polygon | MultiPolygon
-      >;
+      const subprefs = await loadSpSubprefeiturasGeoJson();
       geojsonBaseRef.current = subprefs;
 
       map.addSource(SOURCE_ID, {
@@ -153,19 +167,25 @@ export function MapaSaoPauloOperacional({
       });
 
       onMouseMove = (e: MapMouseEvent) => {
-        if (!map.getLayer(LAYER_FILL)) return;
-        const features = map.queryRenderedFeatures(e.point, {
-          layers: [LAYER_FILL],
+        ultimoEvento = e;
+        if (moveRaf) return;
+        moveRaf = requestAnimationFrame(() => {
+          moveRaf = 0;
+          const ev = ultimoEvento;
+          if (!ev || !map.getLayer(LAYER_FILL)) return;
+          const features = map.queryRenderedFeatures(ev.point, {
+            layers: [LAYER_FILL],
+          });
+          const props = features[0]?.properties as
+            | { nome_exibicao?: string }
+            | undefined;
+          const nome = props?.nome_exibicao?.trim();
+          if (!nome) {
+            esconderTooltip();
+            return;
+          }
+          mostrarTooltip(ev, nome);
         });
-        const props = features[0]?.properties as
-          | { nome_exibicao?: string }
-          | undefined;
-        const nome = props?.nome_exibicao?.trim();
-        if (!nome) {
-          esconderTooltip();
-          return;
-        }
-        mostrarTooltip(e, nome);
       };
       map.on("mousemove", onMouseMove);
 
@@ -184,6 +204,7 @@ export function MapaSaoPauloOperacional({
 
     return () => {
       ativo = false;
+      if (moveRaf) cancelAnimationFrame(moveRaf);
       if (onMouseMove) map.off("mousemove", onMouseMove);
       canvas.removeEventListener("mouseleave", onContainerLeave);
       map.remove();

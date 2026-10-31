@@ -7,6 +7,7 @@ import {
   ExperienceRestartButton,
   experienceIdFromPath,
 } from "@/components/layout/ExperienceRestartButton";
+import { useExperienceInProgress } from "@/hooks/useExperienceInProgress";
 
 const LINKS = [
   { href: "/", label: "Início", match: (p: string) => p === "/" },
@@ -26,6 +27,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const navLinks = LINKS.filter((link) => !link.match(pathname));
   const experienceAtiva = experienceIdFromPath(pathname);
+  const experienciaEmAndamento = useExperienceInProgress(experienceAtiva);
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-md dark:border-neutral-800 dark:bg-black">
@@ -50,7 +52,7 @@ export function SiteHeader() {
               ))}
             </nav>
           ) : null}
-          {experienceAtiva ? (
+          {experienceAtiva && experienciaEmAndamento ? (
             <ExperienceRestartButton
               experience={experienceAtiva}
               className="min-h-10 rounded-lg px-3 py-2"

@@ -7,6 +7,7 @@ import { ExperienceChrome } from "@/components/layout/ExperienceChrome";
 import { ActionGroup } from "@/components/ui/ActionGroup";
 import { Panel } from "@/components/ui/Panel";
 import { computeTremorOffset, getTremorConfig } from "@/lib/tremor";
+import { setExperienceInProgress } from "@/lib/experience-progress";
 
 type CampoId = "nome" | "cargo" | "departamento" | "email" | "identificacao";
 
@@ -31,7 +32,7 @@ export function TremorExperience() {
     identificacao: "",
   });
   const [campoAtivo, setCampoAtivo] = useState<CampoId | null>(null);
-  const [cursor, setCursor] = useState({ x: 0, y: 0 });
+  const cursorOverlayRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
   const mouseRef = useRef({ x: 0, y: 0 });
@@ -40,6 +41,10 @@ export function TremorExperience() {
   const preenchidos = CAMPOS.filter((c) => valores[c.id].trim().length > 0)
     .length;
   const todosPreenchidos = preenchidos === CAMPOS.length;
+
+  useEffect(() => {
+    setExperienceInProgress("tremor", etapa !== "intro");
+  }, [etapa]);
 
   useEffect(() => {
     if (!simulacaoAtiva) return;
@@ -94,10 +99,11 @@ export function TremorExperience() {
     const tick = (t: number) => {
       const offset = computeTremorOffset(t, getTremorConfig());
       tremorRef.current = offset;
-      setCursor({
-        x: mouseRef.current.x + offset.x,
-        y: mouseRef.current.y + offset.y,
-      });
+      const el = cursorOverlayRef.current;
+      if (el) {
+        el.style.left = `${mouseRef.current.x + offset.x}px`;
+        el.style.top = `${mouseRef.current.y + offset.y}px`;
+      }
       rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
@@ -179,8 +185,8 @@ export function TremorExperience() {
     <div ref={containerRef} className="relative">
       {simulacaoAtiva && (
         <div
+          ref={cursorOverlayRef}
           className="pointer-events-none fixed z-[70] h-8 w-8 -translate-x-1/2 -translate-y-1/2"
-          style={{ left: cursor.x, top: cursor.y }}
           aria-hidden
         >
           <svg viewBox="0 0 24 24" className="h-8 w-8 text-slate-900 drop-shadow-md dark:text-neutral-100">

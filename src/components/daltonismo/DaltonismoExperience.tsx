@@ -216,7 +216,7 @@ export function DaltonismoExperience() {
             <ExperienceRestartButton experience="daltonismo" />
             <Button href="/">Voltar ao início</Button>
             <Button href="/experiencias/tremor" variant="secondary">
-              Tremor motor
+              Parkinson
             </Button>
           </ActionGroup>
         </Panel>

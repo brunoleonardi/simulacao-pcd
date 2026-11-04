@@ -14,7 +14,7 @@ const EXPERIENCIAS = [
     titulo: "Quando controlar o mouse se torna um desafio",
     descricao:
       "Preencha a ficha de cadastro no sistema de Recursos Humanos.",
-    tag: "Tremor motor",
+    tag: "Parkinson",
   },
 ] as const;
 
@@ -22,7 +22,7 @@ const COMO_FUNCIONA = [
   {
     id: "escolha",
     titulo: "Seleção do módulo",
-    texto: "Escolha Daltonismo ou Tremor motor na página inicial.",
+    texto: "Escolha Daltonismo ou Parkinson na página inicial.",
   },
   {
     id: "fluxo",

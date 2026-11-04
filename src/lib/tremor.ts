@@ -1,5 +1,5 @@
 /**
- * Simulação educativa de tremor motor — escala interna de intensidade.
+ * Simulação educativa de Parkinson (tremor no cursor) — escala interna de intensidade.
  * Nível 2: tremor moderado (referência clínica simplificada, não diagnóstica).
  */
 export type ParkinsonNivel = 1 | 2 | 3;

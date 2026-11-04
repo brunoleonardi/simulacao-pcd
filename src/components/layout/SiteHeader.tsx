@@ -18,7 +18,7 @@ const LINKS = [
   },
   {
     href: "/experiencias/tremor",
-    label: "Tremor motor",
+    label: "Parkinson",
     match: (p: string) => p.startsWith("/experiencias/tremor"),
   },
 ] as const;

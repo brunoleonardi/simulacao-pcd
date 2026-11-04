@@ -11,7 +11,7 @@ export const EXPERIENCE_META: Record<
     href: "/experiencias/daltonismo",
   },
   tremor: {
-    titulo: "Tremor motor",
+    titulo: "Parkinson",
     href: "/experiencias/tremor",
   },
 };

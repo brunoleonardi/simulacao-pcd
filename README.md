@@ -15,7 +15,7 @@ Este repositório reúne **duas experiências** em formato web (Next.js), cada u
 | Módulo | Cenário | O que você faz |
 |--------|---------|----------------|
 | **Daltonismo** | Operações · e-mail + mapa de São Paulo | Escolhe um perfil de visão de cores, lê a demanda como no correio, interpreta o mapa das subprefeituras pela legenda e responde três perguntas de prioridade. |
-| **Tremor motor** | RH · ficha de cadastro | Preenche campos com simulação de tremor no cursor e teclado virtual, como quem tem dificuldade de apontar e clicar com precisão. |
+| **Parkinson** | RH · ficha de cadastro | Preenche campos com simulação de tremor no cursor e teclado virtual, como quem tem dificuldade de apontar e clicar com precisão. |
 
 O objetivo não é “acertar por acertar”, e sim **sentir o atrito** de tarefas comuns quando a interface ou a informação não foi pensada para todo mundo — e, na conclusão, **comparar** o que você viu com uma referência mais acessível (por exemplo, mapa com cores de referência ou formulário sem tremor).
 
@@ -30,7 +30,7 @@ O objetivo não é “acertar por acertar”, e sim **sentir o atrito** de taref
 
 ---
 
-## Tremor motor · detalhes técnicos (resumo)
+## Parkinson · detalhes técnicos (resumo)
 
 - Offset aleatório no cursor durante a simulação, com clique sintético nos alvos sob o ponteiro “tremido”.
 - Teclado virtual para reduzir dependência de digitação precisa no teclado físico.
